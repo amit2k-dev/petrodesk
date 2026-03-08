@@ -3,27 +3,27 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-# Humne yahan 'os.getenv' ka use kiya hai. 
-# Ab aapko code baar-baar badalne ki zaroorat nahi padegi.
-DATABASE_URL = os.getenv("DATABASE_URL", "mysql+pymysql://root:@localhost:3307/petrol-pump-system")
+# Render mein humne jo DATABASE_URL set kiya hai, ye wahan se link lega
+# Iske liye aapko Render ke Environment Variables mein 
+# KEY: DATABASE_URL 
+# VALUE: [Supabase connection string] daalna hoga
+SQLALCHEMY_DATABASE_URL = os.environ.get("DATABASE_URL")
 
-# pool_pre_ping=True: Ye server disconnect hone par connection ko check karta hai
+# PostgreSQL engine setup
+# connect_args={'sslmode': 'require'} Supabase ke liye zaroori hota hai
 engine = create_engine(
-    DATABASE_URL, 
-    pool_pre_ping=True, 
-    pool_size=10, 
-    max_overflow=20
+    SQLALCHEMY_DATABASE_URL, 
+    connect_args={"sslmode": "require"}
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
 Base = declarative_base()
 
+# Database session hasil karne ke liye helper function
 def get_db():
     db = SessionLocal()
     try:
         yield db
-    except Exception:
-        db.rollback() # Agar error aaye toh transaction rollback kar de
-        raise
     finally:
         db.close()
