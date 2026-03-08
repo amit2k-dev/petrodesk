@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const api = axios.create({
     // .env file mein base URL set karo, warna localhost default rahega
-    baseURL: import.meta.env.VITE_API_URL || "http://localhost:8000",
+    baseURL: "https://petrodesk-backend.onrender.com",
 });
 
 // Interceptor: Automatic client_id header/params mein daalne ke liye
@@ -16,5 +16,6 @@ api.interceptors.request.use((config) => {
 }, (error) => {
     return Promise.reject(error);
 });
+
 
 export default api;
