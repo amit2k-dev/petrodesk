@@ -23,15 +23,11 @@ app.add_middleware(
 
 # --- 1. AUTH ---
 @app.post("/login")
-@app.post("/login")
-def login(credentials: LoginRequest): 
-    # Hardcoded admin check
-    if credentials.username == "admin" and credentials.password == "admin123":
-        return {"status": "success", "message": "Login Successful"}
+def login(credentials: LoginRequest, db: Session = Depends(get_db)):
+    db_client = db.query(Client).filter(Client.username == credentials.username).first()
     
-    # Agar ye fail hua, tabhi database check karo
-    # db_client = db.query(Client).filter(...).first()
-    return {"status": "error", "message": "Invalid credentials"}
+    if db_client and verify_password(credentials.password, db_client.password):
+        return {"client_id": db_client.id, "pump_name": db_client.pump_name}
     
     raise HTTPException(status_code=401, detail="Invalid Credentials")
 
@@ -318,5 +314,6 @@ def save_salary_payment(client_id: int, data: dict = Body(...), db: Session = De
     db.add(new_record)
     db.commit()
     return {"status": "success", "message": "Salary payment recorded successfully"}
+
 
 
