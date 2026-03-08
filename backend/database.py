@@ -1,11 +1,16 @@
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from dotenv import load_dotenv
 
-# Ye ek 'petrodesk.db' naam ki file banayega
-SQLALCHEMY_DATABASE_URL = "postgresql://postgres:helloamit%402k20@db.hapusnwgdvhshwxnkopt.supabase.co:5432/postgres"
+# .env file load karo (local development ke liye)
+load_dotenv()
 
-# SQLite engine setup
+# Render ya environment se URL uthao
+SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL")
+
+# Engine create karo
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -17,4 +22,3 @@ def get_db():
         yield db
     finally:
         db.close()
-
